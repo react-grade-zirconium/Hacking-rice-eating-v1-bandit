@@ -213,8 +213,8 @@ header{
       <div class="lvgoal" id="l-goal"></div>
       <div class="lvhint" id="l-hint"></div>
       <div class="lvactions">
-        <button class="btn sec" onclick="showHint()">힌트 보기</button>
-        <button class="btn" onclick="showSolution(true)">정답 확인</button>
+        <button type="button" class="btn sec" onclick="showHint()">힌트 보기</button>
+        <button type="button" class="btn" onclick="showSolution(true)">정답 확인</button>
       </div>
       <div class="solution" id="l-solution"></div>
     </div>
@@ -222,8 +222,8 @@ header{
     <div class="inputrow">
       <span class="prompt" id="l-prompt">bandit1@bandit:~$</span>
       <input id="cmd" type="text" placeholder="명령어 입력..." autocomplete="off" spellcheck="false">
-      <button class="btn sec" onclick="clearTerm()">CLR</button>
-      <button class="btn" onclick="submit()">ENTER ↵</button>
+      <button type="button" class="btn sec" onclick="clearTerm()">CLR</button>
+      <button type="button" class="btn" onclick="submitCommand()">ENTER ↵</button>
     </div>
   </div>
 </div>
@@ -475,7 +475,7 @@ function renderHeader(){
   $('l-title').textContent=l.title;
   $('l-badge').textContent=l.badge;
   $('l-goal').textContent=l.goal;
-  $('l-hint').textContent='힌트는 숨겨져 있습니다. 막히면 HINT 버튼을 눌러 단서만 확인하세요.';
+  $('l-hint').textContent='힌트는 숨겨져 있습니다. 막히면 힌트 보기 버튼을 눌러 단서만 확인하세요.';
   $('l-solution').className='solution';
   $('l-solution').innerHTML='';
   $('l-prompt').textContent=l.user+'@bandit:~$';
@@ -525,7 +525,7 @@ function go(idx){
   $('cmd').focus();
 }
 
-function submit(){
+function submitCommand(){
   const raw=$('cmd').value.trim();
   $('cmd').value='';
   if(!raw)return;
@@ -596,7 +596,7 @@ function submit(){
 }
 
 $('cmd').addEventListener('keydown',e=>{
-  if(e.key==='Enter'){submit();return;}
+  if(e.key==='Enter'){submitCommand();return;}
   if(e.key==='ArrowUp'){
     e.preventDefault();
     const ni=Math.min(histIdx+1,hist.length-1);
