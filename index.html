@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bandit Wargame Simulator — Level 13~20</title>
+<title>Bandit Wargame Simulator — Level 1~20</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,700;1,400&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -187,10 +187,10 @@ header{
 
 <header>
   <div class="logo">BANDIT<em>SIM</em></div>
-  <div class="tagline">OVERTHEWIRE · LV 13–20</div>
+  <div class="tagline">OVERTHEWIRE · LV 1–20</div>
   <div class="hdr-right">
-    <span>LEVEL <b id="h-lv">13</b></span>
-    <span>DONE <b id="h-prog">0/8</b></span>
+    <span>LEVEL <b id="h-lv">1</b></span>
+    <span>DONE <b id="h-prog">0/20</b></span>
   </div>
 </header>
 <div class="pbar"><div class="pfill" id="pfill" style="width:0"></div></div>
@@ -205,7 +205,7 @@ header{
     </div>
     <div class="term" id="term" onclick="document.getElementById('cmd').focus()"></div>
     <div class="inputrow">
-      <span class="prompt" id="l-prompt">bandit13@bandit:~$</span>
+      <span class="prompt" id="l-prompt">bandit1@bandit:~$</span>
       <input id="cmd" type="text" placeholder="명령어 입력..." autocomplete="off" spellcheck="false">
       <button class="btn sec" onclick="clearTerm()">CLR</button>
       <button class="btn" onclick="submit()">ENTER ↵</button>
@@ -215,6 +215,121 @@ header{
 
 <script>
 const LEVELS=[
+  {id:1,user:"bandit1",title:"Level 1 → 2",badge:"DASH FILE",
+   goal:"홈 디렉토리에 있는 이름이 '-'인 파일을 읽어 다음 비밀번호를 찾으세요.",
+   hint:"하이픈(-)은 옵션으로 해석될 수 있어요. <b>cat ./-</b> 처럼 경로를 붙여 파일 이름임을 명확히 하세요.",
+   steps:[
+    {m:["ls","ls -la"],o:"-",fb:{ok:1,msg:"✓ 파일 이름이 '-' 하나뿐입니다. 그냥 cat - 하면 표준입력으로 오해될 수 있어요."}},
+    {m:["cat ./-","cat < -","cat /home/bandit1/-"],o:"rRGizSaX8Mk1RTb1CNQoXTcYZWU6lgzi",fb:{ok:1,msg:"🎉 레벨 클리어! '-' 파일은 ./- 처럼 상대경로로 지정하면 됩니다."},done:1},
+   ],
+   wrong:{"cat -":"❌ cat - 는 파일이 아니라 표준입력(stdin)을 뜻합니다. cat ./- 를 사용하세요.","cat":"⚠ 읽을 파일을 지정하세요: cat ./-","less -":"❌ - 가 옵션처럼 해석됩니다. less ./- 처럼 입력하세요."}},
+
+  {id:2,user:"bandit2",title:"Level 2 → 3",badge:"SPACES",
+   goal:"공백이 포함된 파일 이름을 올바르게 지정해 파일 내용을 읽으세요.",
+   hint:"파일 이름을 따옴표로 감싸거나 백슬래시로 공백을 이스케이프하세요: <b>cat \"spaces in this filename\"</b>",
+   steps:[
+    {m:["ls","ls -la"],o:"spaces in this filename",fb:null},
+    {m:["cat spaces\\ in\\ this\\ filename","cat 'spaces in this filename'","cat \"spaces in this filename\""],o:"aBZ0W5EmUfAf7kHTQeOwd8bauFJ2lAiG",fb:{ok:1,msg:"🎉 레벨 클리어! 공백 파일명 처리 성공!"},done:1},
+   ],
+   wrong:{"cat spaces in this filename":"❌ 쉘이 4개의 인자로 나눠버렸어요. 따옴표나 \\ 공백을 사용하세요.","cat spaces":"❌ 파일 이름 전체를 지정해야 합니다."}},
+
+  {id:3,user:"bandit3",title:"Level 3 → 4",badge:"HIDDEN",
+   goal:"inhere 디렉토리 안의 숨김 파일을 찾아 읽으세요.",
+   hint:"숨김 파일은 일반 ls에 보이지 않습니다. <b>cd inhere</b> → <b>ls -la</b> → <b>cat .hidden</b>",
+   steps:[
+    {m:["ls"],o:"inhere",fb:null},
+    {m:["cd inhere","ls -la inhere"],o:"total 12\ndrwxr-xr-x 2 root    root    4096\ndrwxr-xr-x 3 root    root    4096\n-rw-r----- 1 bandit4 bandit3   33 .hidden",fb:{ok:1,msg:"✓ .hidden 파일 발견! 이제 내용을 읽어보세요."}},
+    {m:["cat inhere/.hidden","cat .hidden"],o:"2EW7BBsr6aMMoJ2HjW067dm8EgX26xNe",fb:{ok:1,msg:"🎉 레벨 클리어! 숨김 파일은 ls -la 로 찾습니다."},done:1},
+   ],
+   wrong:{"ls inhere":"⚠ 일반 ls로는 숨김 파일이 보이지 않아요. ls -la inhere 를 써보세요.","cat inhere":"❌ inhere는 디렉토리입니다. 내부의 .hidden 파일을 읽으세요."}},
+
+  {id:4,user:"bandit4",title:"Level 4 → 5",badge:"FILE TYPE",
+   goal:"inhere 디렉토리의 여러 파일 중 사람이 읽을 수 있는 파일을 찾아 비밀번호를 확인하세요.",
+   hint:"파일 내용이 깨져 보이면 바이너리입니다. <b>file ./-file*</b> 로 ASCII text 파일을 찾고 <b>cat ./-file07</b> 하세요.",
+   steps:[
+    {m:["ls","ls inhere"],o:"-file00  -file01  -file02  -file03  -file04  -file05  -file06  -file07  -file08  -file09",fb:null},
+    {m:["file inhere/*","file ./-file*","file inhere/-file*"],o:"inhere/-file00: data\ninhere/-file01: data\ninhere/-file02: data\ninhere/-file03: data\ninhere/-file04: data\ninhere/-file05: data\ninhere/-file06: data\ninhere/-file07: ASCII text\ninhere/-file08: data\ninhere/-file09: data",fb:{ok:1,msg:"✓ -file07만 ASCII text 입니다."}},
+    {m:["cat inhere/-file07","cat ./-file07","cat ./inhere/-file07"],o:"lrIWWI6bB37kxfiCQZqUdOIYfr6eEeqR",fb:{ok:1,msg:"🎉 레벨 클리어! file 명령으로 파일 형식을 구분했습니다."},done:1},
+   ],
+   wrong:{"cat inhere/*":"⚠ 바이너리 파일까지 출력되어 터미널이 깨질 수 있어요. file 명령으로 먼저 찾으세요.","cat -file07":"❌ -file07이 옵션처럼 해석될 수 있어요. cat ./-file07 또는 cat inhere/-file07"}},
+
+  {id:5,user:"bandit5",title:"Level 5 → 6",badge:"FIND",
+   goal:"inhere 아래에서 사람이 읽을 수 있고, 1033 bytes이며, 실행 불가능한 파일을 찾으세요.",
+   hint:"<b>find inhere -type f -size 1033c ! -executable -exec file {} +</b> 로 조건을 좁힌 뒤 해당 파일을 cat 하세요.",
+   steps:[
+    {m:["ls","ls inhere"],o:"maybehere00  maybehere01  maybehere02  maybehere03  maybehere04  maybehere05  maybehere06  maybehere07  maybehere08  maybehere09 ...",fb:null},
+    {m:["find inhere -type f -size 1033c ! -executable","find . -type f -size 1033c ! -executable","find inhere -type f -readable -size 1033c ! -executable"],o:"inhere/maybehere07/.file2",fb:{ok:1,msg:"✓ 조건에 맞는 파일 발견! 내용을 읽어보세요."}},
+    {m:["cat inhere/maybehere07/.file2","cat ./inhere/maybehere07/.file2"],o:"P4L4vucdmLnm8I7Vl7jG1ApGSfjYKqJU",fb:{ok:1,msg:"🎉 레벨 클리어! find 조건 검색 성공!"},done:1},
+   ],
+   wrong:{"find inhere":"⚠ 조건이 부족해요. -type f -size 1033c ! -executable 을 추가하세요.","cat inhere/maybehere07":"❌ 디렉토리가 아니라 내부의 .file2 를 읽어야 합니다."}},
+
+  {id:6,user:"bandit6",title:"Level 6 → 7",badge:"OWNERSHIP",
+   goal:"서버 어딘가에서 user가 bandit7, group이 bandit6, 크기가 33 bytes인 파일을 찾아 읽으세요.",
+   hint:"권한 오류는 버려도 됩니다. <b>find / -user bandit7 -group bandit6 -size 33c 2>/dev/null</b> → <b>cat /var/lib/dpkg/info/bandit7.password</b>",
+   steps:[
+    {m:["find / -user bandit7 -group bandit6 -size 33c 2>/dev/null","find / -type f -user bandit7 -group bandit6 -size 33c 2>/dev/null"],o:"/var/lib/dpkg/info/bandit7.password",fb:{ok:1,msg:"✓ 소유자/그룹/크기 조건에 맞는 파일 발견!"}},
+    {m:["cat /var/lib/dpkg/info/bandit7.password"],o:"z7WtoNQU2XfjmMtWA8u5rN4vzqu4v99S",fb:{ok:1,msg:"🎉 레벨 클리어! find와 2>/dev/null 조합 완료!"},done:1},
+   ],
+   wrong:{"find /":"⚠ 전체 검색은 권한 오류가 많아요. -user bandit7 -group bandit6 -size 33c 2>/dev/null 조건을 넣으세요.","cat /etc/bandit_pass/bandit7":"❌ 직접 읽을 권한이 없습니다. 조건에 맞는 파일을 찾아야 해요."}},
+
+  {id:7,user:"bandit7",title:"Level 7 → 8",badge:"GREP",
+   goal:"data.txt 파일에서 millionth 라는 단어 옆에 있는 비밀번호를 찾으세요.",
+   hint:"큰 파일에서 특정 단어가 있는 줄만 찾을 때는 <b>grep millionth data.txt</b> 를 사용하세요.",
+   steps:[
+    {m:["ls"],o:"data.txt",fb:null},
+    {m:["grep millionth data.txt","cat data.txt | grep millionth"],o:"millionth\tfLyj9mAhS6zMdczY8o3iW5vQ8XcSgD3M",fb:{ok:1,msg:"🎉 레벨 클리어! grep으로 원하는 줄만 추출했습니다."},done:1},
+   ],
+   wrong:{"cat data.txt":"⚠ 파일이 매우 큽니다. grep millionth data.txt 로 검색하세요.","grep data.txt millionth":"❌ 순서가 바뀌었어요: grep millionth data.txt"}},
+
+  {id:8,user:"bandit8",title:"Level 8 → 9",badge:"UNIQUE",
+   goal:"data.txt에서 딱 한 번만 등장하는 줄이 다음 비밀번호입니다.",
+   hint:"중복 줄을 세려면 정렬이 먼저 필요합니다. <b>sort data.txt | uniq -u</b>",
+   steps:[
+    {m:["ls"],o:"data.txt",fb:null},
+    {m:["sort data.txt | uniq -u","cat data.txt | sort | uniq -u"],o:"4CKMh1JI91bUIZZPXDqGanal4xvAg0JM",fb:{ok:1,msg:"🎉 레벨 클리어! sort 후 uniq -u 로 유일한 줄을 찾았습니다."},done:1},
+   ],
+   wrong:{"uniq -u data.txt":"❌ uniq는 인접한 중복만 처리합니다. 먼저 sort data.txt 를 해야 해요.","sort data.txt":"⚠ 정렬만으로는 부족해요. | uniq -u 를 이어 붙이세요."}},
+
+  {id:9,user:"bandit9",title:"Level 9 → 10",badge:"STRINGS",
+   goal:"data.txt 바이너리 파일에서 '=' 문자가 여러 개 포함된 사람이 읽을 수 있는 문자열을 찾으세요.",
+   hint:"바이너리에서 출력 가능한 문자열만 뽑으려면 <b>strings data.txt</b>, 그 뒤 <b>grep ===</b> 로 좁히세요.",
+   steps:[
+    {m:["ls"],o:"data.txt",fb:null},
+    {m:["strings data.txt | grep ===","strings data.txt | grep =","cat data.txt | strings | grep ==="],o:"========== the*2i4\n========== password\n========== is\n========== FGUW5ilLVJrxX9kMYMmlN4MgbpfMiqey",fb:{ok:1,msg:"🎉 레벨 클리어! strings로 바이너리 속 텍스트를 추출했습니다."},done:1},
+   ],
+   wrong:{"cat data.txt":"⚠ 바이너리 파일이라 깨진 문자가 많아요. strings data.txt 를 사용하세요.","grep === data.txt":"⚠ 바이너리에서는 strings로 사람이 읽을 수 있는 부분만 먼저 추출하세요."}},
+
+  {id:10,user:"bandit10",title:"Level 10 → 11",badge:"BASE64",
+   goal:"data.txt의 base64로 인코딩된 문자열을 디코딩해 다음 비밀번호를 얻으세요.",
+   hint:"base64 디코딩 옵션은 <b>-d</b> 입니다: <b>base64 -d data.txt</b>",
+   steps:[
+    {m:["ls"],o:"data.txt",fb:null},
+    {m:["base64 -d data.txt","cat data.txt | base64 -d","base64 --decode data.txt"],o:"The password is dtR173fZKb0RRsDFSGsg2RWnpNVj3qRr",fb:{ok:1,msg:"🎉 레벨 클리어! base64 디코딩 완료!"},done:1},
+   ],
+   wrong:{"cat data.txt":"⚠ 인코딩된 문자열입니다. base64 -d data.txt 로 디코딩하세요.","base64 data.txt":"❌ 인코딩이 아니라 디코딩이 필요합니다. -d 옵션을 추가하세요."}},
+
+  {id:11,user:"bandit11",title:"Level 11 → 12",badge:"ROT13",
+   goal:"data.txt의 모든 영문자가 13자리 회전되어 있습니다. 원문으로 되돌려 비밀번호를 찾으세요.",
+   hint:"ROT13은 tr로 처리할 수 있습니다: <b>cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'</b>",
+   steps:[
+    {m:["ls"],o:"data.txt",fb:null},
+    {m:["cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'","tr 'A-Za-z' 'N-ZA-Mn-za-m' < data.txt","cat data.txt | tr \"A-Za-z\" \"N-ZA-Mn-za-m\""],o:"The password is 7x16WNeHIi5YkIhWsfFIqoognUTyj9Q4",fb:{ok:1,msg:"🎉 레벨 클리어! ROT13 복호화 완료!"},done:1},
+   ],
+   wrong:{"cat data.txt":"⚠ 글자가 회전되어 있어 그대로는 읽기 어렵습니다. tr로 ROT13을 적용하세요.","rot13":"⚠ rot13 명령이 없을 수 있어요. tr 'A-Za-z' 'N-ZA-Mn-za-m' 를 사용하세요."}},
+
+  {id:12,user:"bandit12",title:"Level 12 → 13",badge:"HEXDUMP",
+   goal:"data.txt는 여러 번 압축된 파일의 hex dump입니다. 원본 바이너리로 되돌리고 압축을 반복 해제해 비밀번호를 찾으세요.",
+   hint:"작업 디렉토리를 만들고 <b>xxd -r data.txt > data</b> 후 <b>file</b> 로 형식을 확인하며 gzip/bzip2/tar를 순서대로 풀어보세요.",
+   steps:[
+    {m:["ls"],o:"data.txt",fb:null},
+    {m:["mkdir /tmp/bandit12","mktemp -d","mkdir /tmp/mybandit12"],o:"/tmp/bandit12",fb:{ok:1,msg:"✓ /tmp 작업 디렉토리 준비 완료. data.txt를 복사하고 xxd -r로 되돌리세요."}},
+    {m:["xxd -r data.txt > data","xxd -r ~/data.txt > data","xxd -r /home/bandit12/data.txt > data"],o:"",fb:{ok:1,msg:"✓ hex dump를 원본 바이너리로 복원했습니다. file data 로 압축 형식을 확인하세요."}},
+    {m:["file data","file data*"],o:"data: gzip compressed data",fb:{ok:1,msg:"✓ gzip → bzip2 → gzip → tar → tar → bzip2 → tar → gzip 순서로 계속 풀면 됩니다."}},
+    {m:["gzip -d data.gz && bzip2 -d data.bz2","zcat data | bzcat","tar -xf data.tar"],o:"압축 해제 진행 중...",fb:{ok:1,msg:"✓ 방향은 맞습니다. file로 확인하며 끝까지 반복하세요."}},
+    {m:["cat data8","cat data8.bin","cat final","cat password"],o:"The password is FO5dwFsc0cbaIiH0h8J2eUks2vdTDwAn",fb:{ok:1,msg:"🎉 레벨 클리어! hex dump 복원과 다중 압축 해제 성공!"},done:1},
+   ],
+   wrong:{"cat data.txt":"⚠ hex dump 텍스트입니다. xxd -r data.txt > data 로 바이너리를 복원하세요.","xxd data.txt":"❌ 덤프를 다시 만드는 것이 아니라 되돌려야 합니다. xxd -r 를 사용하세요.","file data.txt":"⚠ data.txt 자체는 ASCII hex dump입니다. 먼저 xxd -r 로 복원하세요."}},
+
   {id:13,user:"bandit13",title:"Level 13 → 14",badge:"SSH KEY",
    goal:"홈 디렉토리의 sshkey.private 키 파일로 bandit14에 로그인하고 /etc/bandit_pass/bandit14를 읽으세요.",
    hint:"<b>chmod 600 sshkey.private</b> → <b>ssh -i sshkey.private bandit14@localhost</b> → <b>cat /etc/bandit_pass/bandit14</b>",
@@ -297,7 +412,7 @@ const LEVELS=[
         "echo 'GbKksEFF4yrVs6il55v6gwY5aVje5f0j' | nc -l -p 33333 &",
         "nc -l -p 33333 &","nc -l localhost -p 33333 &"],
      o:"[1] 25823\n포트 33333 대기 중...",fb:{ok:1,msg:"✓ nc 리스닝 서버 백그라운드 실행 중! ./suconnect 33333 을 실행하세요."}},
-    {m:["./suconnect 33333"],o:"Read: GbKksEFF4yrVs6il55v6gwY5aVje5f0j\nPassword matches, sending next password\ngE269g2h3mw3pwgrj0Ha9Uoqen1c9DGr",fb:{ok:1,msg:"🏆 전체 클리어! 8단계 완료! 대단합니다!"},done:1},
+    {m:["./suconnect 33333"],o:"Read: GbKksEFF4yrVs6il55v6gwY5aVje5f0j\nPassword matches, sending next password\ngE269g2h3mw3pwgrj0Ha9Uoqen1c9DGr",fb:{ok:1,msg:"🏆 전체 클리어! 20단계 완료! 대단합니다!"},done:1},
    ],
    wrong:{"./suconnect":"❌ 포트 번호 필요: ./suconnect 33333","nc localhost 33333":"❌ 리스닝 서버를 먼저 열어야 해요: echo '비번' | nc -l -p 33333 &"}},
 ];
@@ -328,8 +443,8 @@ function renderHeader(){
   $('l-hint').innerHTML='💡 '+l.hint;
   $('l-prompt').textContent=l.user+'@bandit:~$';
   $('h-lv').textContent=l.id;
-  $('h-prog').textContent=done.size+'/8';
-  $('pfill').style.width=(done.size/8*100)+'%';
+  $('h-prog').textContent=done.size+'/'+LEVELS.length;
+  $('pfill').style.width=(done.size/LEVELS.length*100)+'%';
 }
 
 function addLine(cls,txt){
@@ -444,10 +559,10 @@ $('cmd').addEventListener('keydown',e=>{
 // init
 renderSidebar();
 renderHeader();
-addLine('sys','OverTheWire Bandit Simulator — Level 13~20');
+addLine('sys','OverTheWire Bandit Simulator — Level 1~20');
 addLine('sys',"'help' 힌트  |  'hint' 단계별 힌트  |  'next' 다음 레벨 이동");
 addLine('mt','');
-addLine('info','▶ Level 13 → 14 시작! ls 로 시작해보세요.');
+addLine('info','▶ Level 1 → 2 시작! ls 로 시작해보세요.');
 $('cmd').focus();
 </script>
 </body>
